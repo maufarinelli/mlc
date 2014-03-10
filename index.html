@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="author" content="Mauricio Farinelli">
+    <meta name="application-name" content="My Lottery Checker - Canada">
+    <title data-i18n="app_title"></title>
+    <script data-main="js/start.require" src="js/require.js"></script>
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<div id="open-menu" class="main-wrapper">
+    <div class="nav-offcanvas">
+        <h3 data-i18n="nav_title"></h3>
+        <nav>
+            <ul class="list-unstyled">
+                <li class="provinces"><span class="subtitle h3" data-i18n="nav_label_provinces"></span></li>
+
+                <li class="province"><a class="h3">Ontario <span class="arrow-open"></span></a>
+                    <ul class="is-hidden">
+                        <li><a class="h3" data-require="lottomax" data-province="on" href="">Lotto Max <span class="arrow-right"></span></a></li>
+                        <li><a class="h3" data-require="lotto649" data-province="on" href="">Lotto 6/49 <span class="arrow-right"></span></a></li>
+                        <li><a class="h3" data-province="on" href="">Ontario 49 <span class="arrow-right"></span></a></li>
+                    </ul>
+                </li>
+                <li class="province"><a class="h3">Québec <span class="arrow-open"></span></a>
+                    <ul class="is-hidden">
+                        <li><a class="h3" data-require="lottomax" data-province="qc" href="">Lotto Max <span class="arrow-right"></span></a></li>
+                        <li><a class="h3" data-require="lotto649" data-province="qc" href="">Lotto 6/49 <span class="arrow-right"></span></a></li>
+                        <li><a class="h3" data-province="qc" href="">Québec Max <span class="arrow-right"></span></a></li>
+                        <li><a class="h3" data-require="quebec49" data-province="qc" href="">Québec 49 <span class="arrow-right"></span></a></li>
+                    </ul>
+                </li>
+
+                <li class="languages"><a class="subtitle h3"><span data-i18n="nav_label_languages"></span> <span class="arrow-open"></span></a>
+                    <ul class="is-hidden">
+                        <li class="language"><a class="h3" data-lang="en" href="">English</a></li>
+                        <li class="language"><a class="h3" data-lang="fr" href="">Français</a></li>
+                    </ul>
+                </li>
+
+                <li class="provinces"><a class="h3 reset-app">Reset app</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="content-wrapper">
+        <header class="header clearfix">
+            <div class="icon-menu-toggle">
+                <a href="#open-menu" class="toggle-open"></a>
+                <a href="#" class="toggle-close"></a>
+            </div>
+            <h1 data-i18n="app_title"></h1><img src="img/flag_canada.png" alt="Canada" />
+        </header>
+
+        <div class="content">
+            <!-- The content of each lottery page - tmp initial content will be inserted here -->
+        </div>
+    </div>
+</div>
+
+<!-- Templates -->
+<!-- Initial content template-->
+<script id="tmp-initial-content" type="text/template">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 last-draw">
+                <ul></ul>
+            </div>
+        </div>
+
+        <div class="row my-numbers clearfix"></div>
+        <div class="row extra-wrapper clearfix"></div>
+        <div class="row guaranteed-prize-wrapper clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <button class="btn btn-default add-new-numbers" data-i18n="button_add_numbers"></button>
+                <button id="delete-all" class="btn btn-warning del-all" data-i18n="button_delete_all"></button>
+            </div>
+        </div>
+
+        <div class="row choose-numbers is-hidden">
+            <div class="col-md-12">
+                <p class="selection-error text-warning is-hidden" data-i18n="error_message_set_numbers"></p>
+                <% for(var i=1; i < 50; i++) { %>
+                    <button type="button" class="btn btn-default btn-choose-numbers" value="<%= i %>"><% if (i < 10) { %><%= '0'+i %><% } else { %><%= i %><% } %></button>
+                <% } %>
+
+                <button id="save-numbers" class="btn btn-success" type="button" data-i18n="button_save"></button>
+            </div>
+        </div>
+
+        <div class="row btn-wrapper text-center"></div>
+        <div class="row input-wrapper"></div>
+
+        <div class="billboard text-billboard"></div>
+    </div>
+</script>
+
+<script id="tmp-numbers-title" type="text/template">
+    <h4 data-i18n="setOfNumbers_title"></h4>
+</script>
+
+<!-- Set of numbers -->
+<script id="tmp-numbers-wrapper" type="text/template">
+    <div class="number clearfix">
+        <ul>
+            <li class="set-order"><%= index %>: </li>
+            <%= list %>
+        </ul>
+        <button id="btn-delete-<%= i %>" class="btn btn-warning del"><%= btn_del %></button>
+    </div>
+</script>
+
+<!-- Extra number -->
+<script id="tmp-extra-wrapper" type="text/template">
+    <div class="number clearfix">
+        <p><span class="set-order"><%= title %></span>
+        <% _.each(extra, function(extra_n) { %>
+            <% if (extra_n.status) { %> <span class="text-green"><strong><%= extra_n.n %></strong></span><% } else { %> <span><%= extra_n.n %></span><% } %>
+        <% }); %>
+        <button id="btn-delete-extra" class="btn btn-warning btn-del-extra"><%= btn_del %></button></p>
+    </div>
+</script>
+
+<!-- Guaranteed number -->
+<script id="tmp-guaranteed-wrapper" type="text/template">
+    <div class="number clearfix">
+        <p><span class="set-order"><%= title %></span> <%= guaranteed %>
+        <button id="btn-delete-guaranteed" class="btn btn-warning btn-del-guaranteed"><%= btn_del %></button></p>
+    </div>
+</script>
+
+<!-- Guaranteed number winner -->
+<script id="tmp-guaranteed-wrapper-winner" type="text/template">
+    <div class="number clearfix">
+        <p><span class="set-order"><%= title %></span> <strong class="text-green"><%= guaranteed %></strong>
+        <button id="btn-delete-guaranteed" class="btn btn-warning btn-del-guaranteed"><%= btn_del %></button></p>
+    </div>
+</script>
+
+<!-- Each li of the set of numbers -->
+<script id="tmp-numbers-li" type="text/template">
+    <li><%= number %></li>
+</script>
+
+<!-- Each winning li of the set of numbers -->
+<script id="tmp-numbers-li-win" type="text/template">
+    <li class="text-green"><strong><%= number %></strong></li>
+</script>
+
+<!-- Title of the last draw -->
+<script id="tmp-title-last-draw" type="text/template">
+    <h2><%= title %><span><%= sort %></span></h2>
+</script>
+
+<!-- each li of the last draw -->
+<script id="tmp-last-draw" type="text/template">
+    <li <%= class_bonus %>><%= lastdraw_number %></li>
+</script>
+
+<!-- last draw date -->
+<script id="tmp-data-last-draw" type="text/template">
+    <p><%= date %></p>
+</script>
+
+<!-- last draw extra -->
+<script id="tmp-extra-last-draw" type="text/template">
+    <p class="no-marginbottom"><%= title %><span><%= extra %></span></p>
+</script>
+
+<!-- last draw guaranteed prize -->
+<script id="tmp-guaranteed-last-draw" type="text/template">
+    <p><%= title %><span><%= guaranteed %></span></p>
+</script>
+
+<!-- Guaranteed button -->
+<script id="tmp-guaranteed-btn" type="text/template">
+    <button class="btn btn-default add-new-guaranteed" data-i18n="button_add_guaranteed"></button>
+</script>
+
+<!-- Extra button -->
+<script id="tmp-extra-btn" type="text/template">
+    <button class="btn btn-default add-new-extra" data-i18n="button_add_extra"></button>
+</script>
+
+<!-- Guaranteed input -->
+<script id="tmp-guaranteed-input" type="text/template">
+    <div class="row choose-guaranteed is-hidden">
+        <div class="col-md-12 text-center form-inline">
+            <p class="selection-error text-warning is-hidden" data-i18n="error_message_guaranteed"></p>
+            <input class="form-control" placeholder="00000000-00" maxlength="11" id="my-guaranteed" name="input-my-guaranteed" value="" />
+            <button id="save-guaranteed" class="btn btn-success" type="button" data-i18n="button_save">Save</button>
+        </div>
+    </div>
+</script>
+
+<!-- Extra input -->
+<script id="tmp-extra-input" type="text/template">
+    <div class="row choose-extra is-hidden">
+        <div class="col-md-12 text-center form-inline">
+            <p class="selection-error text-warning is-hidden" data-i18n="error_message_extra"></p>
+            <input type="number" class="form-control" placeholder="0000000" maxlength="7" id="my-extra" name="input-my-extra" value="" />
+            <button id="save-extra" class="btn btn-success" type="button" data-i18n="button_save">Save</button>
+        </div>
+    </div>
+</script>
+
+<!-- Billboard paragraph -->
+<script id="tmp-billboard-paragraph" type="text/template">
+    <p><%= message %></p>
+</script>
+
+</body>
+</html>
