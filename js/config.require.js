@@ -7,35 +7,13 @@ if(typeof localStorage.lang === 'undefined') {
 }
 
 require.config({
-    paths: {
-        'moduleLotteries': 'require/moduleLotteries',
-        'jQuery': 'external/jquery-1.10.2.min',
-        'underscore': 'external/underscore',
-        'Backbone': 'external/backbone.1.0.0',
-        'translation': 'translation',
-        'en': 'locales/en',
-        'fr': 'locales/fr',
-        'core649': 'models/core649',
-        'lotto649': 'models/lottery649',
-        'quebec49': 'models/quebec49',
-        'views': 'views/views',
-        'instance_lotto649': 'instances/instance_lotto649',
-        'instance_quebec49': 'instances/instance_quebec49',
-        'instances_views': 'instances/instances_views',
-    },
     shim: {
-        'moduleLotteries': {
+        moduleLotteries: {
             exports: 'moduleLotteries'
         },
 
         // Libraries
-        'jQuery': {
-            exports: '$'
-        },
-        'underscore': {
-            exports: '_'
-        },
-        'Backbone': {
+        backbone: {
             deps: ['underscore', 'jQuery'],
             exports: 'Backbone'
         },
@@ -99,7 +77,23 @@ require.config({
             deps: ['actions'],
             exports: 'translation'
         }
-    }
+    },
+    paths: {
+        moduleLotteries: 'require/moduleLotteries',
+        jquery: 'external/jquery-1.10.2.min',
+        lodash: 'external/lodash.compat.min',
+        backbone: 'external/backbone.1.0.0',
+        translation: 'translation',
+        en: 'locales/en',
+        fr: 'locales/fr',
+        core649: 'models/core649',
+        'lotto649': 'models/lottery649',
+        'quebec49': 'models/quebec49',
+        'views': 'views/views',
+        'instance_lotto649': 'instances/instance_lotto649',
+        'instance_quebec49': 'instances/instance_quebec49',
+        'instances_views': 'instances/instances_views',
+    },
 });
 
 require(['moduleLotteries'], function(moduleLotteries) {
